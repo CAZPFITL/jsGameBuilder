@@ -1,0 +1,25 @@
+@font-face {
+    font-family: "Mouse";
+    src: local("Mouse"), url("./font.woff") format("woff");
+}
+
+html {
+    font-family: "Mouse";
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.15;
+    -webkit-overflow-scrolling: touch;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    overflow: hidden;
+    position: relative;
+}
+
+#controlsCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
