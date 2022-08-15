@@ -35,14 +35,14 @@ export default class Physics {
         (entity.speed > entity.maxSpeed) && (entity.speed = entity.maxSpeed);
         (entity.speed < -entity.maxSpeed) && (entity.speed = -entity.maxSpeed);
 
-        // absolute stop the entity
-        (entity.speed > -this.stopRange) &&
-        (entity.speed < this.stopRange) &&
-        (entity.speed = 0);
-
         // add friction and absolute repose in lower ranges
         (entity.speed > 0) && (entity.speed -= entity.friction);
         (entity.speed < 0) && (entity.speed += entity.friction);
+
+        // absolute stop the entity
+        if ((entity.speed > -this.stopRange) && (entity.speed < this.stopRange)) {
+            entity.speed = 0;
+        }
 
         // this works under the unit circle logic using sin or cos multiplied by speed to get the translation
         this.worldLimits({
