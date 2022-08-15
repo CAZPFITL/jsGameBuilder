@@ -38,12 +38,12 @@ export default class JsGameBuilder {
     }
 
     #loadGameLevel() {
-        // this.level = new GameLevel({
-        //     app,
-        //     game: this,
-        //     width: 2000,
-        //     height: 1800
-        // })
+        this.level = new GameLevel({
+            app,
+            game: this,
+            width: 200,
+            height: 180
+        })
         this.state.setState(MAIN_MENU);
     }
 

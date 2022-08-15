@@ -96,7 +96,6 @@ export default class Screen {
                 background: COLORS.BLACK[0],
             }
         }
-
         this.buttonsCollection = {
             MAIN_MENU: {
                 start: {
@@ -118,7 +117,6 @@ export default class Screen {
                 }
             }
         }
-
         this.decorations = {
             MAIN_MENU: {
                 title: {
@@ -127,10 +125,10 @@ export default class Screen {
                         ctx: this.app.gui.ctx,
                             font: "72px Mouse",
                         text: this.app.game.constructor.name,
-                        x: 0,
+                        x: -300,
                         y: -100,
                         color: this.colors.MAIN_MENU.mainCard.text,
-                        width: this.app.gui.ctx.measureText(this.app.game.constructor.name).width,
+                        width: 600,
                         height: 30,
                         center: true
                     }
@@ -163,12 +161,12 @@ export default class Screen {
             const item = collection[i];
             this.app.gui.get[item.type](item.props);
         }
-        // CANVAS BACKGROUND
-        this.app.gui.ctx.canvas.style.backgroundColor =
-            this.colors[this.app.game.state.state].background;
         // HOVER EVENTS
         Object.entries(this.buttonsCollection[this.app.game.state.state] ?? {}).forEach(key => {
             this.hoverCollection[key[0]] = key[1].props;
         });
+        // CANVAS BACKGROUND
+        this.app.gui.ctx.canvas.style.backgroundColor =
+            this.colors[this.app.game.state.state].background;
     }
 }
