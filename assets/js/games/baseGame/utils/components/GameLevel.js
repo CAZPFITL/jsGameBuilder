@@ -8,7 +8,7 @@ export default class GameLevel {
         this.name = 'GameLevel #' + id;
         this.coords = { x: -width / 2, y: -height / 2 };
         this.size = { width, height }
-        this.color = '#523f32';
+        this.color = '#595959';
         this.boundTargets = {};
         this.addedRules = addedRules;
         this.loadEntitiesList = [];
