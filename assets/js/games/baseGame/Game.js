@@ -1,4 +1,5 @@
 import GameLevel from "./utils/components/GameLevel.js";
+import Entity from "./utils/entities/Entity.js";
 import Gui from "./utils/gui/Gui.js";
 import States from "../../engine/utils/patterns/State.js";
 import Player from "./utils/components/Player.js";
@@ -38,12 +39,17 @@ export default class JsGameBuilder {
     }
 
     #loadGameLevel() {
-        this.level = new GameLevel({
+        this.level = this.app.factory.create(GameLevel,{
             app,
             game: this,
             width: 200,
             height: 180
         })
+        this.app.factory.create(Entity, {
+            app,
+            game: this,
+        })
+
         this.state.setState(MAIN_MENU);
     }
 

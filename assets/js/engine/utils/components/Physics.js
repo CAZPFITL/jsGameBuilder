@@ -48,12 +48,11 @@ export default class Physics {
         this.worldLimits({
             x: Math.sin(entity.angle) * entity.speed,
             y: Math.cos(entity.angle) * entity.speed
-        }, entity);
+        }, entity.coords);
     }
 
     worldLimits({x, y}, entity) {
         const limits = this.app.game.level.size;
-
         // Limit Movement
         (entity.x > -limits.width / 2 && entity.x < limits.width / 2)
             ? (entity.x -= x) :

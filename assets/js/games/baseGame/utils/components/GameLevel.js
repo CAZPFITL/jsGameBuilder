@@ -12,8 +12,7 @@ export default class GameLevel {
         this.boundTargets = {};
         this.addedRules = addedRules;
         this.loadEntitiesList = [];
-        game.constructor.name === 'Ants2' && this.loadEntities();
-        this.app.factory.addGameEntity(this);
+        this.loadEntities();
     }
 
     /**
