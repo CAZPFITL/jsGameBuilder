@@ -155,8 +155,8 @@ export default class Screen {
     draw() {
         // DECLARE COLLECTION
         const collection = [
-            ...Object.values(this.decorations[this.app.game.state.state]),
-            ...Object.values(this.buttonsCollection[this.app.game.state.state]),
+            ...Object.values(this.decorations[this.app.game.state.state] ?? {}),
+            ...Object.values(this.buttonsCollection[this.app.game.state.state] ?? {}),
         ];
         // DRAW COLLECTION
         for (let i = 0; i < collection.length; i++) {
@@ -167,7 +167,7 @@ export default class Screen {
         this.app.gui.ctx.canvas.style.backgroundColor =
             this.colors[this.app.game.state.state].background;
         // HOVER EVENTS
-        Object.entries(this.buttonsCollection[this.app.game.state.state]).forEach(key => {
+        Object.entries(this.buttonsCollection[this.app.game.state.state] ?? {}).forEach(key => {
             this.hoverCollection[key[0]] = key[1].props;
         });
     }

@@ -11,7 +11,7 @@ import {
     NETWORK
 } from "./env.js";
 
-export default class BaseGame {
+export default class JsGameBuilder {
     constructor(app, loadCallback) {
         this.app = app;
         this.useMusicBox = true;
