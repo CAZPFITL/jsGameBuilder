@@ -1,4 +1,3 @@
-
 import {GAME_OVER, PLAY} from "../../env.js";
 
 export default class GameLevel {
@@ -31,21 +30,21 @@ export default class GameLevel {
                 // Left
                 { x: topLeft.x, y: topLeft.y },
                 { x: bottomLeft.x, y: topLeft.y },
-                { x: bottomLeft - 1, ...bottomLeft.y },
-                { x: topLeft - 1, ...topLeft.y },
+                { x: bottomLeft.x - 1, y: bottomLeft.y },
+                { x: topLeft.x - 1, y: topLeft.y },
                 // Right
-                topRight,
-                bottomRight,
-                { x: bottomRight + 1, ...bottomRight.y },
-                { x: topRight + 1, ...topRight.y },
+                { x: topRight.x, y: bottomRight.y },
+                { x: bottomRight.x, y: bottomRight.y },
+                { x: bottomRight.x + 1, y: bottomRight.y },
+                { x: topRight.x + 1, y: topRight.y },
                 // Top
-                topLeft,
-                topRight,
+                { x: topLeft.x, y: topLeft.y },
+                { x: topRight.x, y: topRight.y },
                 { x: topRight.x, y: topRight.y - 1 },
                 { x: topLeft.x, y: topLeft.y - 1 },
                 // Bottom
-                bottomLeft,
-                bottomRight,
+                { x: bottomLeft.x, y: bottomLeft.y },
+                { x: bottomRight.x, y: bottomRight.y },
                 { x: bottomRight.x, y: bottomRight.y + 1 },
                 { x: bottomLeft.x, y: bottomLeft.y + 1 }
             ]
@@ -84,7 +83,7 @@ export default class GameLevel {
      */
     draw() {
         if (this.app.game.state.state === PLAY ||
-                this.app.game.state.state === GAME_OVER) {
+            this.app.game.state.state === GAME_OVER) {
             // TODO change this to get the level
             this.app.gui.ctx.fillStyle = this.color;
             this.app.gui.ctx.fillRect(this.coords.x, this.coords.y, this.size.width, this.size.height);

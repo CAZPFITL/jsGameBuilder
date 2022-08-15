@@ -37,8 +37,8 @@ export default class Physics {
 
         // absolute stop the entity
         (entity.speed > -this.stopRange) &&
-            (entity.speed < this.stopRange) &&
-                (entity.speed = 0);
+        (entity.speed < this.stopRange) &&
+        (entity.speed = 0);
 
         // add friction and absolute repose in lower ranges
         (entity.speed > 0) && (entity.speed -= entity.friction);
@@ -48,19 +48,20 @@ export default class Physics {
         this.worldLimits({
             x: Math.sin(entity.angle) * entity.speed,
             y: Math.cos(entity.angle) * entity.speed
-        }, entity.coords);
+        }, entity);
     }
 
     worldLimits({x, y}, entity) {
-        const limits = this.app.game.level.size;
+        const coords = entity.coords;
         // Limit Movement
-        (entity.x > -limits.width / 2 && entity.x < limits.width / 2)
-            ? (entity.x -= x) :
-            (entity.x -= entity.x > 0 ? 0.1 : -0.1);
-
-        (entity.y > -limits.height / 2 && entity.y < limits.height / 2)
-            ? (entity.y -= y) :
-            (entity.y -= entity.y > 0 ? 0.1 : -0.1);
+        (
+            !this.app.gui.get.polysIntersect(entity.polygons, this.app.game.level.boundTargets.polygons.slice(0, 4)) &&
+            !this.app.gui.get.polysIntersect(entity.polygons, this.app.game.level.boundTargets.polygons.slice(5, 8))
+        ) ? (coords.x -= x) : (coords.x -= coords.x > 0 ? 0.1 : -0.1);
+        (
+            !this.app.gui.get.polysIntersect(entity.polygons, this.app.game.level.boundTargets.polygons.slice(8, 11)) &&
+            !this.app.gui.get.polysIntersect(entity.polygons, this.app.game.level.boundTargets.polygons.slice(12, 15))
+        ) ? (coords.y -= y) : (coords.y -= coords.y > 0 ? 0.1 : -0.1);
     }
 
     isInBound(entity) {
