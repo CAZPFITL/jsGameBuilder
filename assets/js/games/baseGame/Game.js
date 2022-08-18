@@ -1,4 +1,5 @@
 import GameLevel from "./utils/components/GameLevel.js";
+import Entity from "./utils/entities/Entity.js";
 import Gui from "./utils/gui/Gui.js";
 import States from "../../engine/utils/patterns/State.js";
 import Player from "./utils/components/Player.js";
@@ -11,7 +12,7 @@ import {
     NETWORK
 } from "./env.js";
 
-export default class BaseGame {
+export default class JsGameBuilder {
     constructor(app, loadCallback) {
         this.app = app;
         this.useMusicBox = true;
@@ -38,12 +39,17 @@ export default class BaseGame {
     }
 
     #loadGameLevel() {
-        // this.level = new GameLevel({
-        //     app,
-        //     game: this,
-        //     width: 2000,
-        //     height: 1800
-        // })
+        this.level = this.app.factory.create(GameLevel,{
+            app,
+            game: this,
+            width: 200,
+            height: 180
+        })
+        this.app.factory.create(Entity, {
+            app,
+            game: this,
+        })
+
         this.state.setState(MAIN_MENU);
     }
 

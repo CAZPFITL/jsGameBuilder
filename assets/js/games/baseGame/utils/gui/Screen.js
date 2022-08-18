@@ -1,31 +1,26 @@
-import {PLAY, MAIN_MENU, GAME_OVER} from "../../env.js";
+import {PLAY, MAIN_MENU, GAME_OVER, COLORS} from "../../env.js";
 
 export default class Screen {
     constructor(app, gui) {
         this.app = app;
         this.gui = gui;
         this.hoverCollection = {};
-        this.buttonsStates = {
-            start: 'normal'
-        }
-        this.buttonsCollection = {
-            'start': {}
-        }
-        this.#updateControlsData();
+        this.decorations = {};
+        this.buttonsStates = {};
+        this.buttonsCollection = {};
+        this.colors = {};
         this.#addListeners();
     }
+
     /**
      * Private methods
      */
     #addListeners() {
-        // HOVER EVENT -----------------------------------
-        this.app.controls.pushListener(this,'mousemove', (e) => {
-            // TRANSLATE COORDS - general process
-            const hoverTranslatedCoords = this.app.gui.get.viewportCoords(e, this.app.camera.viewport);
-            // HOVER COLLECTION - general process
+        this.app.controls.pushListener(this, 'mousemove', (event) => {
+            // HOVER COLLECTION
             this.app.gui.get.checkHoverCollection({
                 collection: this.hoverCollection,
-                event: e,
+                event,
                 viewport: this.app.camera.viewport,
                 isHover: (key) => {
                     (this.buttonsStates[key] !== 'click') && (this.buttonsStates[key] = 'hover');
@@ -37,126 +32,160 @@ export default class Screen {
                     this.hoverCaller = null;
                     this.gui.hoverStateOut();
                 },
-                caller: this.hoverCaller
+                caller: this.hoverCaller,
             });
         });
-        // CLICK EVENT -----------------------------------
-        this.app.controls.pushListener(this,'click', (e) => {
-            const click = this.app.gui.get.clickCoords(e, this.app.camera.viewport);
-        });
-        // MOUSE UP EVENT --------------------------------
-        this.app.controls.pushListener(this,'mouseup', (e) => {
-            const click = this.app.gui.get.clickCoords(e, this.app.camera.viewport);
-            // START GAME --------------------------------
-            this.app.gui.get.isClicked(
-                this.buttonsCollection.start,
-                click,
-                () => this.app.game.state.setState(PLAY)
-            );
-            // CLEAR CLICKS ------------------------------
+        this.app.controls.pushListener(this, 'mouseup', (event) => {
+            const coords = {x: event.offsetX, y: event.offsetY};
+            const viewportCtx = this.app.gui.get.clickCoords(event, this.app.camera.viewport);
+            const buttons = {
+                start: {coords: viewportCtx, ...this.buttonsCollection.MAIN_MENU.start}
+            }
+            Object.keys(buttons).forEach(key => {
+                this.app.gui.get.isClicked(
+                    buttons[key].props,
+                    buttons[key].coords,
+                    () => {
+                        this.buttonsStates[key] = 'normal';
+                        buttons[key].props?.callbacks?.mouseup && buttons[key].props.callbacks.mouseup();
+                    }
+                )
+            });
             this.buttonsStates.start = 'normal'
         });
-        // MOUSE DOWN EVENT ------------------------------
-        this.app.controls.pushListener(this,'mousedown', (e) => {
-            const click = this.app.gui.get.clickCoords(e, this.app.camera.viewport);
-            // SHOW FPS ----------------------------------
-            (e.which === 2) && this.app.gui.get.isClicked(
-                {
-                    x: 0,
-                    y: 0,
-                    width: this.app.gui.ctx.canvas.width,
-                    height: this.app.gui.ctx.canvas.height
-                },
-                {x: e.offsetX, y: e.offsetY},
-                () => this.app.toggleStats()
-            );
-            // CLICK ON START ----------------------------
-            this.app.gui.get.isClicked(
-                this.buttonsCollection.start,
-                click,
-                () => this.buttonsStates.start = 'click'
-            );
+        this.app.controls.pushListener(this, 'mousedown', (event) => {
+            const coords = {x: event.offsetX, y: event.offsetY};
+            const viewportCoords = this.app.gui.get.clickCoords(event, this.app.camera.viewport);
+            const buttons = {
+                start: {coords: viewportCoords, ...this.buttonsCollection.MAIN_MENU.start}
+            }
+            Object.keys(buttons).forEach(key => {
+                this.app.gui.get.isClicked(
+                    buttons[key].props,
+                    buttons[key].coords,
+                    () => {
+                        this.buttonsStates[key] = 'click';
+                        buttons[key].props?.callbacks?.mousedown && buttons[key].props.callbacks.mousedown();
+                    }
+                )
+            });
+        });
+        this.app.controls.pushListener(this, 'click', (event) => {
+            const coords = {x: event.offsetX, y: event.offsetY};
+            const buttons = {}
+            Object.keys(buttons).forEach(key => {
+                this.app.gui.get.isClicked(
+                    buttons[key].props,
+                    buttons[key].coords,
+                    () => {
+                        this.buttonsStates[key] = this.buttonsStates[key] === 'click' ? 'normal' : 'click';
+                        buttons[key].props?.callbacks?.click && buttons[key].props.callbacks.click();
+                    }
+                )
+            });
         });
     }
 
-    #updateControlsData() {
-        const font = "16px Mouse";
-        this.buttonsCollection = {
-            'start': {
-                x: -200,
-                y: -0,
-                width: 400,
-                height: 100,
-                text: 'Start',
-                font,
-                bg: this.buttonsStates.start === 'hover' ? '#d2cf00'
-                    : this.buttonsStates.start === 'click' ? '#456c00'
-                        : '#90d901',
-            }
-        }
-    }
-
-    drawDecorations() {
-        if (this.app.game.state.state === MAIN_MENU) {
-            this.app.gui.get.square({
-                ctx: this.app.gui.ctx,
-                x: -300,
-                y: -200,
-                width: 600,
-                height: 400,
-                color: 'rgba(0,0,0,0.6)',
-                stroke: '#90d901',
-                widthStroke: 5
-            });
-            this.app.gui.get.text({
-                ctx: this.app.gui.ctx,
-                font: "72px Mouse",
-                text: this.app.game.constructor.name,
-                x: 0,
-                y: -100,
-                color: '#ffffff',
-                width: this.app.gui.ctx.measureText(this.app.game.constructor.name).width,
-                height: 30,
-                center: true
-            });
-            this.app.gui.ctx.canvas.style.backgroundColor = 'rgb(74,0,159)';
-        }
-        if (this.app.game.state.state === PLAY) { }
-    }
-
-    /**
-     * Draw Decoration / Controls
-     */
-    drawControls() {
-        const ctx = this.app.gui.ctx;
-
-        const menu = this.app.game.state.state === MAIN_MENU;
-
-        const looper = (menu) ? {
-            start: {ctx, ...this.buttonsCollection.start},
-        } : {};
-
-        this.hoverCollection = {};
-
-        Object.keys(looper).forEach(key => {
-            if (Object.keys(looper[key]).length > 0) {
-                this.app.gui.get.button({...looper[key], stroke: '#000000', widthStroke: 8});
-            }
-
-            this.hoverCollection[key] = looper[key];
-        });
-    }
-
-    /**
-     * Draw and Update methods
-     */
     update() {
-        this.#updateControlsData();
+        this.colors = {
+            MAIN_MENU: {
+                background: COLORS.PURPLE[0],
+                buttons: {
+                    variation1: {
+                        hover: COLORS.YELLOW[0],
+                        click: COLORS.GREEN[0],
+                        normal: COLORS.GREEN[1],
+                        stroke: COLORS.BLACK[0],
+                    },
+                },
+                mainCard: {
+                    text: COLORS.WHITE[0],
+                    background: COLORS.BLACK[4],
+                    color: COLORS.GREEN[0],
+                    width: 5
+                }
+            },
+            PLAY: {
+                background: COLORS.BLACK[0],
+            }
+        }
+        this.buttonsCollection = {
+            MAIN_MENU: {
+                start: {
+                    type: 'button',
+                    props: {
+                        position: 'viewport',
+                        ctx: this.app.gui.ctx,
+                        x: -200,
+                        y: -0,
+                        width: 400,
+                        height: 100,
+                        text: 'Start',
+                        font: '16px Mouse',
+                        bg: this.buttonsStates.start === 'hover' ? this.colors.MAIN_MENU.buttons.variation1.hover
+                            : this.buttonsStates.start === 'click' ? this.colors.MAIN_MENU.buttons.variation1.click
+                                : this.colors.MAIN_MENU.buttons.variation1.normal,
+                        stroke: this.colors.MAIN_MENU.buttons.variation1.stroke,
+                        widthStroke: 8,
+                        callbacks: {
+                            mouseup: () => {
+                                this.app.game.state.setState(PLAY);
+                            }
+                        }
+                    }
+                }
+            },
+        }
+        this.decorations = {
+            MAIN_MENU: {
+                title: {
+                    type: 'text',
+                    props:{
+                        ctx: this.app.gui.ctx,
+                            font: "72px Mouse",
+                        text: this.app.game.constructor.name,
+                        x: -300,
+                        y: -100,
+                        color: this.colors.MAIN_MENU.mainCard.text,
+                        width: 600,
+                        height: 30,
+                        center: true
+                    }
+                },
+                mainCard: {
+                    type: 'square',
+                    props: {
+                        ctx: this.app.gui.ctx,
+                            x: -300,
+                        y: -200,
+                        width: 600,
+                        height: 400,
+                        color: this.colors.MAIN_MENU.mainCard.background,
+                        stroke: this.colors.MAIN_MENU.mainCard.color,
+                        widthStroke: this.colors.MAIN_MENU.mainCard.width
+                    }
+                }
+            }
+        }
     }
 
     draw() {
-        // MAIN MENU SCREEN ELEMENTS
-        this.drawDecorations();
-        this.drawControls();
+        // DECLARE COLLECTION
+        const collection = [
+            ...Object.values(this.decorations[this.app.game.state.state] ?? {}),
+            ...Object.values(this.buttonsCollection[this.app.game.state.state] ?? {}),
+        ];
+        // DRAW COLLECTION
+        for (let i = 0; i < collection.length; i++) {
+            const item = collection[i];
+            this.app.gui.get[item.type](item.props);
+        }
+        // HOVER EVENTS
+        Object.entries(this.buttonsCollection[this.app.game.state.state] ?? {}).forEach(key => {
+            this.hoverCollection[key[0]] = key[1].props;
+        });
+        // CANVAS BACKGROUND
+        this.app.gui.ctx.canvas.style.backgroundColor =
+            this.colors[this.app.game.state.state].background;
     }
 }
