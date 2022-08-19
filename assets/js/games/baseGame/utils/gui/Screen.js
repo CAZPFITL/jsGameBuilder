@@ -129,7 +129,9 @@ export default class Screen {
                         widthStroke: 8,
                         callbacks: {
                             mouseup: () => {
+                                this.buttonsStates.start = 'normal';
                                 this.app.game.state.setState(PLAY);
+                                this.gui.hoverStateOut();
                             }
                         }
                     }
@@ -169,6 +171,7 @@ export default class Screen {
         }
     }
 
+
     draw() {
         // DECLARE COLLECTION
         const collection = [
@@ -177,15 +180,27 @@ export default class Screen {
         ];
         // DRAW COLLECTION
         for (let i = 0; i < collection.length; i++) {
-            const item = collection[i];
-            this.app.gui.get[item.type](item.props);
+            try {
+                const item = collection[i];
+                if (typeof this.app.gui.get[item.type] === 'function') {
+                    this.app.gui.get[item.type](item.props);
+                }
+            } catch (error) {
+                console.error(
+                    'verify item.props are provided with next keys:' +
+                    'position, ctx, x, y, width, height, text, font, bg, stroke, widthStroke, callbacks' +
+                    error
+                );
+                debugger;
+            }
         }
+        // CLEAR HOVER COLLECTION
+        this.hoverCollection = {};
         // HOVER EVENTS
         Object.entries(this.buttonsCollection[this.app.game.state.state] ?? {}).forEach(key => {
             this.hoverCollection[key[0]] = key[1].props;
         });
         // CANVAS BACKGROUND
-        this.app.gui.ctx.canvas.style.backgroundColor =
-            this.colors[this.app.game.state.state].background;
+        this.app.gui.ctx.canvas.style.backgroundColor = this.colors[this.app.game.state.state].background;
     }
 }
