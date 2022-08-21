@@ -87,10 +87,12 @@ export default class Gui {
 
     static checkHoverCollection({collection, event, viewport, isHover, isOut, caller}) {
         for (const key in collection) {
-            if (
-                Gui.isHover(collection[key], {x: event.clientX, y: event.clientY}) ||
-                Gui.isHover(collection[key], Gui.viewportCoords(event, viewport))
-            ) {
+            if (collection[key]?.position === 'viewport' &&
+                Gui.isHover(collection[key], Gui.viewportCoords(event, viewport))) {
+                isHover(key);
+            }
+            else if (collection[key]?.position === 'controls' &&
+                Gui.isHover(collection[key], {x: event.clientX, y: event.clientY})) {
                 isHover(key);
             } else {
                 if (caller === key) {
