@@ -22,36 +22,35 @@ export default class Screen {
      */
     #addListeners(abstractEvents) {
         this.app.controls.pushListener(this, 'mousemove', (event) => {
-            const hoverTranslatedCoords = this.app.gui.get.viewportCoords({
-                x: event.offsetX,
-                y: event.offsetY
-            }, this.app.camera.viewport);
-
             this.app.gui.get.checkHoverCollection({
                 collection: this.hoverCollection,
                 event,
                 viewport: this.app.camera.viewport,
                 isHover: (key) => {
-                    (this.buttonsStates[key] !== 'click') && (this.buttonsStates[key] = 'hover');
-                    this.hoverCaller = key;
-                    this.gui.hoverStateIn();
+                    if (this.buttonsStates[key] !== 'click' && this.buttonsStates[key] !== 'hover') {
+                        this.buttonsStates[key] = 'hover';
+                        this.hoverCaller = key;
+                        this.gui.hoverStateIn();
+                    }
                 },
                 isOut: (key) => {
-                    (this.buttonsStates[key] !== 'click') && (this.buttonsStates[key] = 'normal');
-                    this.hoverCaller = null;
-                    this.gui.hoverStateOut();
+                    if (this.buttonsStates[key] !== 'click' && this.buttonsStates[key] !== 'normal') {
+                        this.buttonsStates[key] = 'normal';
+                        this.hoverCaller = null;
+                        this.gui.hoverStateOut();
+                    }
                 },
                 caller: this.hoverCaller,
             });
-            abstractEvents.mousemove(event, hoverTranslatedCoords);
+            abstractEvents.mousemove(event, this.app.gui.get.viewportCoords({
+                x: event.offsetX,
+                y: event.offsetY
+            }, this.app.camera.viewport));
         });
         this.app.controls.pushListener(this, 'mouseup', (event) => {
-            const buttons = {
-                ...this.buttonsCollection.MAIN_MENU,
-                ...this.buttonsCollection.PLAY
-            }
+            const buttons = this.#getButtons()
 
-            Object.keys(buttons).forEach(key => {
+            Object.keys(buttons).forEach((key) => {
                 const ctx = buttons[key].props.ctx === this.app.gui.ctx
                     ? this.app.gui.get.clickCoords(event, this.app.camera.viewport)
                     : {x: event.offsetX, y: event.offsetY};
@@ -62,15 +61,13 @@ export default class Screen {
                     () => buttons[key].props?.callbacks?.mouseup && buttons[key].props.callbacks.mouseup()
                 )
             });
+
             abstractEvents.mouseup(event);
         });
         this.app.controls.pushListener(this, 'mousedown', (event) => {
-            const buttons = {
-                ...this.buttonsCollection.MAIN_MENU,
-                ...this.buttonsCollection.PLAY
-            }
+            const buttons = this.#getButtons()
 
-            Object.keys(buttons).forEach(key => {
+            Object.keys(buttons).forEach((key) => {
                 const ctx = buttons[key].props.ctx === this.app.gui.ctx
                     ? this.app.gui.get.clickCoords(event, this.app.camera.viewport)
                     : {x: event.offsetX, y: event.offsetY};
@@ -84,12 +81,9 @@ export default class Screen {
             abstractEvents.mousedown(event);
         });
         this.app.controls.pushListener(this, 'click', (event) => {
-            const buttons = {
-                ...this.buttonsCollection.MAIN_MENU,
-                ...this.buttonsCollection.PLAY
-            }
+            const buttons = this.#getButtons()
 
-            Object.keys(buttons).forEach(key => {
+            Object.keys(buttons).forEach((key) => {
                 const ctx = buttons[key].props.ctx === this.app.gui.ctx
                     ? this.app.gui.get.clickCoords(event, this.app.camera.viewport)
                     : {x: event.offsetX, y: event.offsetY};
@@ -103,6 +97,13 @@ export default class Screen {
 
             abstractEvents.click(event);
         });
+    }
+
+    #getButtons() {
+        const output = {};
+        Object.entries(this.buttonsCollection).forEach(key =>
+            Object.entries(key[1]).forEach(button => output[button[0]] = button[1]));
+        return output;
     }
 
     update() {
@@ -155,7 +156,7 @@ export default class Screen {
                         }
                     }
                 }
-            },
+            }
         }
         this.decorations = {
             MAIN_MENU: {
