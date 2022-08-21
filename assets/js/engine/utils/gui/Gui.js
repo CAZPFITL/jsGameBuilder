@@ -87,7 +87,7 @@ export default class Gui {
 
     static checkHoverCollection({collection, event, viewport, isHover, isOut, caller}) {
         for (const key in collection) {
-            if (collection[key]?.position !== 'viewport' &&
+            if (collection[key]?.position === 'viewport' &&
                 Gui.isHover(collection[key], Gui.viewportCoords(event, viewport))) {
                 isHover(key);
             }
